@@ -26,7 +26,9 @@ except ImportError:
 
 
 def release_local(local):
-    """Releases the contents of the local for the current context.
+    """
+    释放当前上下文的local的内容，这样就可以在不使用manager的情况下使用local
+    Releases the contents of the local for the current context.
     This makes it possible to use locals without a manager.
 
     Example::
@@ -88,7 +90,9 @@ class Local(object):
 
 class LocalStack(object):
 
-    """This class works similar to a :class:`Local` but keeps a stack
+    """
+    该class类似Local，但是维护了一个对象的栈
+    This class works similar to a :class:`Local` but keeps a stack
     of objects instead.  This is best explained with an example::
 
         >>> ls = LocalStack()
@@ -103,6 +107,8 @@ class LocalStack(object):
         >>> ls.top
         42
 
+    可以使用LocalManager或release_local释放这些Local，不过正确的用法是使用pop来获取栈顶。
+    当栈为空时，它将不再受限于当前上下文（即被释放）
     They can be force released by using a :class:`LocalManager` or with
     the :func:`release_local` function but the correct way is to pop the
     item from the stack after using.  When the stack is empty it will
@@ -170,7 +176,14 @@ class LocalStack(object):
 
 class LocalManager(object):
 
-    """Local objects cannot manage themselves. For that you need a local
+    """
+    Local无法自我管理，因此你需要一个Local管理器。
+    你可以传递一个LocalManager给多个Local，或将Local append到manager.locals。
+    每次manager清理，它将清除所有留在当前上下文中Local的数据
+
+    iden_func参数可覆盖默认的ident_func
+
+    Local objects cannot manage themselves. For that you need a local
     manager.  You can pass a local manager multiple locals or add them later
     by appending them to `manager.locals`.  Every time the manager cleans up,
     it will clean up all the data left in the locals for this context.
@@ -253,7 +266,9 @@ class LocalManager(object):
 @implements_bool
 class LocalProxy(object):
 
-    """Acts as a proxy for a werkzeug local.  Forwards all operations to
+    """
+    Local的代理，转发所有操作到一个已被代理的对象，
+    Acts as a proxy for a werkzeug local.  Forwards all operations to
     a proxied object.  The only operations not supported for forwarding
     are right handed operands and any kind of assignment.
 
